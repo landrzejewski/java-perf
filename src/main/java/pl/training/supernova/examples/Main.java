@@ -35,7 +35,11 @@ public class Main {
     //@OutputTimeUnit(TimeUnit.MILLISECONDS)
     @Benchmark
     public void testFactorialWithLoop(/*TestInfo testInfo*/) {
-        //System.out.println("Iteration: " + iterationIndex++ /*testInfo.iterationIndex++*/);
+        new Factorial().factorialWithLoop(10);
+    }
+
+    @Benchmark
+    public void testFactorialWithStream(/*TestInfo testInfo*/) {
         new Factorial().factorialWithStreams(10);
     }
 
@@ -44,7 +48,7 @@ public class Main {
                 .include(Factorial.class.getSimpleName())
                 .warmupIterations(1)
                 .measurementIterations(1)
-                .threads(5)
+                .threads(1)
                 .forks(1)
                 .build();
         new Runner(options).run();
