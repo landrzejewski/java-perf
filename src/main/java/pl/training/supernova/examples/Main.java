@@ -6,6 +6,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     private long iterationIndex;
-    private Factorial factorial = new Factorial();
+    private final Factorial factorial = new Factorial();
 
     /*@State(Scope.Benchmark)
     public static class TestInfo {
@@ -34,16 +35,20 @@ public class Main {
         iterationIndex = 1;
     }
 
+    int n = 20;
+
+    @Fork(1)
     //@BenchmarkMode({Mode.SampleTime, Mode.Throughput, Mode.AverageTime})
     //@OutputTimeUnit(TimeUnit.MILLISECONDS)
     @Benchmark
     public void testFactorialWithLoop(Blackhole blackhole /*TestInfo testInfo*/) {
-        blackhole.consume(factorial.factorialWithLoop(20));
+        blackhole.consume(factorial.factorialWithLoop(n));
     }
 
+    @Fork(1)
     @Benchmark
     public void testFactorialWithLoopWithoutBlackHole(/*TestInfo testInfo*/) {
-        factorial.factorialWithLoop(20);
+        factorial.factorialWithLoop(n);
     }
 
    /* @Benchmark
@@ -51,13 +56,15 @@ public class Main {
         return new Factorial().factorialWithStreams(15);
     }*/
 
+    // -Djmh.blackhole.autoDetect=false - disables the need to automatically apply blackhole wrappers
+    // -rff results.csv - save results to file
     public static void main(String[] args) throws RunnerException {
         var options = new OptionsBuilder()
                 //.include(Factorial.class.getSimpleName())
-                .warmupIterations(5)
-                .measurementIterations(5)
+                .warmupIterations(1)
+                .measurementIterations(1)
                 .threads(1)
-                .forks(1)
+                //.forks(1)
                 .build();
         new Runner(options).run();
     }
