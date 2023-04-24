@@ -10,18 +10,19 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 //@BenchmarkMode({Mode.SampleTime, Mode.Throughput, Mode.AverageTime})
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@BenchmarkMode(Mode.Throughput)
+//@OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class Main {
 
-    long iterationIndex;
+    private long iterationIndex;
+    private Factorial factorial = new Factorial();
 
     /*@State(Scope.Benchmark)
     public static class TestInfo {
         long iterationIndex = 0;
     }*/
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Trial)
     public void prepareState() {
         iterationIndex = 1;
         System.out.println("State is ready");
@@ -37,17 +38,22 @@ public class Main {
     //@OutputTimeUnit(TimeUnit.MILLISECONDS)
     @Benchmark
     public void testFactorialWithLoop(Blackhole blackhole /*TestInfo testInfo*/) {
-        blackhole.consume(new Factorial().factorialWithLoop(10));
+        blackhole.consume(factorial.factorialWithLoop(20));
     }
 
     @Benchmark
-    public long testFactorialWithStream(/*TestInfo testInfo*/) {
-        return new Factorial().factorialWithStreams(10);
+    public void testFactorialWithLoopWithoutBlackHole(/*TestInfo testInfo*/) {
+        factorial.factorialWithLoop(20);
     }
+
+   /* @Benchmark
+    public long testFactorialWithStream(*//*TestInfo testInfo*//*) {
+        return new Factorial().factorialWithStreams(15);
+    }*/
 
     public static void main(String[] args) throws RunnerException {
         var options = new OptionsBuilder()
-                .include(Factorial.class.getSimpleName())
+                //.include(Factorial.class.getSimpleName())
                 .warmupIterations(5)
                 .measurementIterations(5)
                 .threads(1)
