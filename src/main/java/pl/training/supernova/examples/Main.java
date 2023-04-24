@@ -1,6 +1,7 @@
 package pl.training.supernova.examples;
 
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
@@ -8,7 +9,8 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
-@BenchmarkMode({Mode.SampleTime, Mode.Throughput, Mode.AverageTime})
+//@BenchmarkMode({Mode.SampleTime, Mode.Throughput, Mode.AverageTime})
+@BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class Main {
 
@@ -34,20 +36,20 @@ public class Main {
     //@BenchmarkMode({Mode.SampleTime, Mode.Throughput, Mode.AverageTime})
     //@OutputTimeUnit(TimeUnit.MILLISECONDS)
     @Benchmark
-    public void testFactorialWithLoop(/*TestInfo testInfo*/) {
-        new Factorial().factorialWithLoop(10);
+    public void testFactorialWithLoop(Blackhole blackhole /*TestInfo testInfo*/) {
+        blackhole.consume(new Factorial().factorialWithLoop(10));
     }
 
     @Benchmark
-    public void testFactorialWithStream(/*TestInfo testInfo*/) {
-        new Factorial().factorialWithStreams(10);
+    public long testFactorialWithStream(/*TestInfo testInfo*/) {
+        return new Factorial().factorialWithStreams(10);
     }
 
     public static void main(String[] args) throws RunnerException {
         var options = new OptionsBuilder()
                 .include(Factorial.class.getSimpleName())
-                .warmupIterations(1)
-                .measurementIterations(1)
+                .warmupIterations(5)
+                .measurementIterations(5)
                 .threads(1)
                 .forks(1)
                 .build();
