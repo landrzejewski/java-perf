@@ -6,14 +6,11 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 @State(Scope.Benchmark)
 //@BenchmarkMode({Mode.SampleTime, Mode.Throughput, Mode.AverageTime})
 @BenchmarkMode(Mode.Throughput)
 //@OutputTimeUnit(TimeUnit.MILLISECONDS)
-public class Main {
+public class JmhExample {
 
     private long iterationIndex;
     private final Factorial factorial = new Factorial();

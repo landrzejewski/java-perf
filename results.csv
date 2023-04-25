@@ -1,3 +1,3 @@
 "Benchmark","Mode","Threads","Samples","Score","Score Error (99,9%)","Unit"
-"pl.training.supernova.examples.Main.testFactorialWithLoop","thrpt",1,5,"148379434,231538","6281892,683540","ops/s"
-"pl.training.supernova.examples.Main.testFactorialWithLoopWithoutBlackHole","thrpt",1,5,"168048526,343315","1054413,516951","ops/s"
+"pl.training.supernova.examples.JmhExample.testFactorialWithLoop","thrpt",1,5,"148379434,231538","6281892,683540","ops/s"
+"pl.training.supernova.examples.JmhExample.testFactorialWithLoopWithoutBlackHole","thrpt",1,5,"168048526,343315","1054413,516951","ops/s"

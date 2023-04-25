@@ -9,7 +9,7 @@ import java.util.Random;
 public class BinaryFileGenerator {
 
     private static final Path FILE_PATH = Paths.get("random.data");
-    private static final long FILE_SIZE = 1024L * 1024L;
+    private static final long FILE_SIZE = 1024L * 1024L * 500L;
     private static final byte[] buffer = new byte[1024];
 
     public static void main(String[] args) throws IOException {
