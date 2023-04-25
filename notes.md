@@ -8,3 +8,10 @@
         * Wydajność dostępu do danych np. tworząc pamięć cache czy tworząc indeks rekordów
           Badaj wydajność swoich pomysłów wykorzystując poznane narzędzia
 
+
+
+Przykładowy rekord:
+id      firstName    lastName     age,   isActive
+long,   String:50,   String:70,   int,   boolean
+
+1 w, 1 m - 100 x CRUD
