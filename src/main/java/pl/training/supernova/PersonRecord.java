@@ -5,8 +5,6 @@ import lombok.Data;
 
 import java.nio.ByteBuffer;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 @Data
 @AllArgsConstructor
 public class PersonRecord implements Record {
@@ -23,8 +21,8 @@ public class PersonRecord implements Record {
     public byte[] toBytes() {
         var buffer = ByteBuffer.allocate(RECORD_SIZE);
         buffer.putLong(id);
-        buffer.put(toField(firstName.getBytes(UTF_8), 50));
-        buffer.put(toField(lastName.getBytes(UTF_8), 70));
+        buffer.put(toField(firstName.getBytes(CHARSET), 50));
+        buffer.put(toField(lastName.getBytes(CHARSET), 70));
         buffer.putInt(age);
         buffer.put(toField(isActive));
         return buffer.array();
@@ -41,9 +39,9 @@ public class PersonRecord implements Record {
     }
 
     private byte[] readBytes(ByteBuffer buffer, int size) {
-        var value = new byte[size];
-        buffer.get(value);
-        return value;
+        var bytes = new byte[size];
+        buffer.get(bytes);
+        return bytes;
     }
 
     @Override
