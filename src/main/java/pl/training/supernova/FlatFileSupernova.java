@@ -48,10 +48,11 @@ public class FlatFileSupernova<R extends Row<I>, I> implements Supernova<R, I> {
     @SneakyThrows
     public synchronized void insert(R row) {
         var id = row.getId();
-        checkIdExistence(id);
-        var position = getEndPosition();
+        var cachedPosition = primaryIndex.get(id);
+        var position = cachedPosition != null ? cachedPosition : getEndPosition();
         primaryIndex.put(id, position);
         addRow(position, row);
+        cache.put(id, row);
         notifyAll();
     }
 
@@ -70,12 +71,6 @@ public class FlatFileSupernova<R extends Row<I>, I> implements Supernova<R, I> {
     private void addRow(long position, R row) throws IOException {
         randomAccessFile.seek(position);
         randomAccessFile.write(row.toBytes());
-    }
-
-    private void checkIdExistence(I id) {
-        if (primaryIndex.containsKey(id)) {
-            throw new DuplicatedKeyException();
-        }
     }
 
     @SuppressWarnings("unchecked")

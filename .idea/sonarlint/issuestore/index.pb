@@ -26,5 +26,3 @@ b
 2src/main/java/pl/training/supernova/PersonRow.java,a\3\a3907d727d1a6c1b97eefc42f4a368be89def05f
 g
 7src/main/java/pl/training/supernova/RecordNotFound.java,6\d\6dccb5b7bb418874a0b368f61b4fc5e17f34e8c0
-l
-<src/main/java/pl/training/supernova/DataAccessException.java,5\c\5cb59d2f08dd53b765dd4a34a618d95ccdba5ed9

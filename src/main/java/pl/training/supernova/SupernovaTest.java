@@ -42,7 +42,7 @@ public class SupernovaTest {
     @Setup(Level.Trial)
     public void beforeAll() throws IOException {
         Files.deleteIfExists(filePath);
-        supernova = new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>(), 500_000);
+        supernova = new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>(), 500);
     }
 
     @TearDown
@@ -72,17 +72,19 @@ public class SupernovaTest {
     @Benchmark
     public void supernovaInsert(OperationCounters counters, TestState testState) {
         var id = testState.numberOfRecords.incrementAndGet();
+        if (id > 1000) {
+            id = random.nextLong(999) + 1;
+        }
         var person = createRow(id);
         supernova.insert(person);
         counters.insert++;
-
     }
 
     @Group("a")
     @GroupThreads(1)
     @Benchmark
     public void supernovaRead(OperationCounters counters, Blackhole blackhole, TestState testState) {
-        var id = random.nextLong(100);
+        var id = random.nextLong(testState.numberOfRecords.get());
         blackhole.consume(supernova.getById(id));
         counters.read++;
     }
@@ -91,7 +93,7 @@ public class SupernovaTest {
       var options = new OptionsBuilder()
                 .include("SupernovaTest")
                 .warmupIterations(0)
-                .measurementIterations(500_000)
+                .measurementIterations(50_000)
                 .threads(2)
                 .forks(1)
                 .build();
