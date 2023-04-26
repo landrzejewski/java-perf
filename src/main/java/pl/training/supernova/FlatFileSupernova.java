@@ -5,20 +5,30 @@ import lombok.SneakyThrows;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class FlatFileSupernova<R extends Row<I>, I> implements Supernova<R, I> {
 
+    private final LinkedHashMap<I, R> cache;
     private final Map<I, Long> primaryIndex;
     private final R row;
     private final RandomAccessFile randomAccessFile;
 
     @SneakyThrows
-    public FlatFileSupernova(Path filePath, R row, Map<I, Long> primaryIndex) {
+    public FlatFileSupernova(Path filePath, R row, Map<I, Long> primaryIndex, int cacheSize) {
         this.randomAccessFile = new RandomAccessFile(filePath.toFile(), "rw");
         this.row = row;
         this.primaryIndex = primaryIndex;
+        cache = new LinkedHashMap<>(cacheSize, 0.75f, true) {
+
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<I, R> eldest) {
+                return size() > cacheSize;
+            }
+
+        };
         init();
     }
 
@@ -42,14 +52,18 @@ public class FlatFileSupernova<R extends Row<I>, I> implements Supernova<R, I> {
         var position = getEndPosition();
         primaryIndex.put(id, position);
         addRow(position, row);
-       // notifyAll();
+        notifyAll();
     }
 
     @Override
     @SneakyThrows
     public synchronized Optional<R> getById(I id) {
+        if (cache.containsKey(id)) {
+            return Optional.of(cache.get(id));
+        }
         var result = getRowPosition(id).map(this::getRow);
-        //notifyAll();
+        result.ifPresent(selectedRow -> cache.put(id, selectedRow));
+        notifyAll();
         return result;
     }
 
