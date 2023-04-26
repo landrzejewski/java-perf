@@ -7,11 +7,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public interface Record {
 
+    Charset CHARSET = UTF_8;
     int START_POSITION = 0;
     byte EMPTY_VALUE = 0xa;
     byte TRUE_VALUE = 0xb;
     byte FALSE_VALUE = 0xc;
-    Charset CHARSET = UTF_8;
+    int LONG_SIZE = 8;
+    int INT_SIZE = 4;
+    int BOOL_SIZE = 1;
 
     byte[] toBytes();
 
