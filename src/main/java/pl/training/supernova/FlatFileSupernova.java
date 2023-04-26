@@ -36,7 +36,7 @@ public class FlatFileSupernova<R extends Row<I>, I> implements Supernova<R, I> {
 
     @Override
     @SneakyThrows
-    public synchronized void insert(R row) {
+    public void insert(R row) {
         var id = row.getId();
         checkIdExistence(id);
         var position = getEndPosition();
@@ -46,7 +46,7 @@ public class FlatFileSupernova<R extends Row<I>, I> implements Supernova<R, I> {
 
     @Override
     @SneakyThrows
-    public synchronized Optional<R> getById(I id) {
+    public Optional<R> getById(I id) {
         return getRowPosition(id).map(this::getRow);
     }
 

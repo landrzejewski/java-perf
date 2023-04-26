@@ -17,10 +17,10 @@ import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@State(Scope.Benchmark)
+@State(Scope.Group)
 public class SupernovaTest {
 
-    private final Path filePath = Paths.get("persons.data");
+    private final Path filePath = Paths.get("persons5.data");
     private final Random random = new Random();
     private long id;
     private long readId;
@@ -43,7 +43,7 @@ public class SupernovaTest {
     @Setup(Level.Trial)
     public void beforeAll() throws IOException {
         Files.deleteIfExists(filePath);
-        supernova = new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>());
+        supernova = new SynchronizedSupernova(new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>()));
     }
 
     @TearDown
@@ -51,7 +51,7 @@ public class SupernovaTest {
         supernova.close();
     }
 
-    @Setup(Level.Invocation)
+    @Setup(Level.Trial)
     public void create() {
         readId = random.nextLong(id + 1);
         nextPerson = PersonRow.builder()
@@ -64,7 +64,7 @@ public class SupernovaTest {
     }
 
     @Group("a")
-    @GroupThreads(1)
+    @GroupThreads(4)
     @Benchmark
     public void supernovaInsert(OperationCounters counters, Blackhole blackhole) {
         ++id;
@@ -73,7 +73,7 @@ public class SupernovaTest {
     }
 
     @Group("a")
-    @GroupThreads(1)
+    @GroupThreads(4)
     @Benchmark
     public void supernovaRead(OperationCounters counters, Blackhole blackhole) {
         blackhole.consume(supernova.getById(readId));
@@ -84,12 +84,30 @@ public class SupernovaTest {
       var options = new OptionsBuilder()
                 .include("SupernovaTest")
                 .warmupIterations(0)
-                .measurementIterations(1_000_000)
-                .threads(2)
+                .measurementIterations(200_000)
+                .threads(8)
                 .forks(1)
                 .build();
         new Runner(options).run();
     }
 
 }
+/*
 
+Benchmark                        Mode     Cnt       Score    Error  Units
+SupernovaTest.a                    ss  200000       0,019 ±  0,001  ms/op
+SupernovaTest.a:insert             ss  200000  200000,000               #
+SupernovaTest.a:read               ss  200000  200000,000               #
+SupernovaTest.a:supernovaInsert    ss  200000       0,022 ±  0,001  ms/op
+SupernovaTest.a:supernovaRead      ss  200000       0,016 ±  0,001  ms/op
+SupernovaTest.a:total              ss  200000  400000,000               #
+
+Benchmark                        Mode     Cnt       Score    Error  Units
+SupernovaTest.a                    ss  200000       0,020 ±  0,001  ms/op
+SupernovaTest.a:insert             ss  200000  200000,000               #
+SupernovaTest.a:read               ss  200000  200000,000               #
+SupernovaTest.a:supernovaInsert    ss  200000       0,021 ±  0,001  ms/op
+SupernovaTest.a:supernovaRead      ss  200000       0,020 ±  0,001  ms/op
+SupernovaTest.a:total              ss  200000  400000,000               #
+
+ */
