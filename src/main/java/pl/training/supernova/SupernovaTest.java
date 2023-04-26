@@ -17,7 +17,7 @@ import java.util.UUID;
 @State(Scope.Benchmark)
 public class SupernovaTest {
 
-    private final Path FILE_PATH = Paths.get("persons.data");
+    private final Path filePath = Paths.get("persons.data");
     private final Random random = new Random();
     private long id;
     private Supernova<PersonRow, Long> supernova;
@@ -25,8 +25,8 @@ public class SupernovaTest {
 
     @Setup(Level.Trial)
     public void beforeAll() throws IOException {
-        Files.deleteIfExists(FILE_PATH);
-        supernova = new FlatFileSupernova<>(FILE_PATH, new PersonRow(), new HashMap<>());
+        Files.deleteIfExists(filePath);
+        supernova = new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>());
     }
 
     @TearDown
