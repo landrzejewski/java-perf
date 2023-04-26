@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @RequiredArgsConstructor
-public class SynchronizedSupernova implements Supernova<PersonRow, Long> {
+public class ReadWriteSynchronizedSupernova implements Supernova<PersonRow, Long> {
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Supernova<PersonRow, Long> supernova;

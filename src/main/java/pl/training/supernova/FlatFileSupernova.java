@@ -46,25 +46,23 @@ public class FlatFileSupernova<R extends Row<I>, I> implements Supernova<R, I> {
 
     @Override
     @SneakyThrows
-    public synchronized void insert(R row) {
+    public void insert(R row) {
         var id = row.getId();
         var cachedPosition = primaryIndex.get(id);
         var position = cachedPosition != null ? cachedPosition : getEndPosition();
         primaryIndex.put(id, position);
         addRow(position, row);
         cache.put(id, row);
-        notifyAll();
     }
 
     @Override
     @SneakyThrows
-    public synchronized Optional<R> getById(I id) {
+    public Optional<R> getById(I id) {
         if (cache.containsKey(id)) {
             return Optional.of(cache.get(id));
         }
         var result = getRowPosition(id).map(this::getRow);
         result.ifPresent(selectedRow -> cache.put(id, selectedRow));
-        notifyAll();
         return result;
     }
 

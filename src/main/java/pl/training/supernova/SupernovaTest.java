@@ -42,7 +42,7 @@ public class SupernovaTest {
     @Setup(Level.Trial)
     public void beforeAll() throws IOException {
         Files.deleteIfExists(filePath);
-        supernova = new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>(), 500);
+        supernova = new ReadWriteSynchronizedSupernova(new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>(), 500));
     }
 
     @TearDown
@@ -101,3 +101,15 @@ public class SupernovaTest {
     }
 
 }
+
+/*
+
+Benchmark                        Mode    Cnt       Score    Error  Units
+SupernovaTest.a                    ss  50000       0,013 ±  0,002  ms/op
+SupernovaTest.a:insert             ss  50000   50000,000               #
+SupernovaTest.a:read               ss  50000   50000,000               #
+SupernovaTest.a:supernovaInsert    ss  50000       0,018 ±  0,004  ms/op
+SupernovaTest.a:supernovaRead      ss  50000       0,007 ±  0,001  ms/op
+SupernovaTest.a:total              ss  50000  100000,000               #
+
+ */
