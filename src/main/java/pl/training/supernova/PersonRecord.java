@@ -1,12 +1,16 @@
 package pl.training.supernova;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.nio.ByteBuffer;
 
+@Builder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PersonRecord implements Record {
 
     private static final int FIRST_NAME_SIZE = 50;

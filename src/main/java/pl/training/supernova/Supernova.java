@@ -3,13 +3,18 @@ package pl.training.supernova;
 public class Supernova {
 
     public static void main(String[] args) {
-        var person = new PersonRecord(1, "Jan", "Kowalski", 30, true);
+        var person = PersonRecord.builder()
+                .id(1)
+                .firstName("Jan")
+                .lastName("Kowalski")
+                .age(30)
+                .isActive(true)
+                .build();
+
         var bytes = person.toBytes();
-        var testPerson = new PersonRecord(0, "", "", 0, false);
+        var testPerson = new PersonRecord();
         testPerson.fromBytes(bytes);
         System.out.println(testPerson);
-
-
     }
 
 }
