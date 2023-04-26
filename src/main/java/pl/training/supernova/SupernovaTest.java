@@ -5,18 +5,34 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 
+@BenchmarkMode(Mode.Throughput)
 @State(Scope.Benchmark)
 public class SupernovaTest {
 
-    private final Supernova<PersonRow, Long> supernova = new Supernova<>(Paths.get("persons3.data"), new PersonRow(), new HashMap<>());
+    private final Path FILE_PATH = Paths.get("persons9.data");
     private final Random random = new Random();
     private long id;
+    private Supernova<PersonRow, Long> supernova;
     private PersonRow nextPerson;
+
+    @Setup(Level.Trial)
+    public void beforeAll() throws IOException {
+        Files.deleteIfExists(FILE_PATH);
+        supernova = new Supernova<>(FILE_PATH, new PersonRow(), new HashMap<>());
+    }
+
+    @TearDown
+    public void afterAll() throws Exception {
+        supernova.close();
+    }
 
     @Setup(Level.Iteration)
     public void create() {
@@ -35,8 +51,8 @@ public class SupernovaTest {
     }
 
     public static void main(String[] args) throws RunnerException {
-        var options = new OptionsBuilder()
-                .include("supernova")
+      var options = new OptionsBuilder()
+                .include("SupernovaTest")
                 .warmupIterations(1)
                 .measurementIterations(1)
                 .threads(1)

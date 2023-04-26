@@ -32,7 +32,6 @@ public class Supernova<R extends Row<I>, I> implements AutoCloseable {
                 position += row.getSize();
             }
         }
-        System.out.println(primaryIndex);
     }
 
     @SneakyThrows
