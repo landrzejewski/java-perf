@@ -82,7 +82,7 @@ public class SupernovaTest {
       var options = new OptionsBuilder()
                 .include("SupernovaTest")
                 .warmupIterations(0)
-                .measurementIterations(100_000)
+                .measurementIterations(10_000)
                 .threads(1)
                 .forks(1)
                 .build();
@@ -91,13 +91,3 @@ public class SupernovaTest {
 
 }
 
-/*
-
-Benchmark                                 Mode  Cnt  Score   Error  Units
-SupernovaTest.supernovaInsertRead         avgt       0,005          ms/op
-SupernovaTest.supernovaInsertRead:insert  avgt       0,016          ms/op
-SupernovaTest.supernovaInsertRead:read    avgt       0,007          ms/op
-
-
-
- */
