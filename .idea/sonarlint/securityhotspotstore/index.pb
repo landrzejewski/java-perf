@@ -15,8 +15,6 @@ k
 ;src/main/java/pl/training/supernova/examples/Factorial.java,2\6\26b1b0c8776e65dcdf3c053bbd53148ed70ddb63
 h
 8src/main/java/pl/training/supernova/examples/Player.java,d\7\d7da22e3112b979420c76ac65ea4922dee173e22
-8
-notes.md,1\2\12dfac2a0a81c21d55e8f3199f9839a60649ecdf
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
@@ -24,8 +22,6 @@ h
 results.csv,1\c\1c22fd0d7b5db97c99cbde94ec3989d70633a214
 7
 pom.xml,4\4\442292b8a7efeabbe4cc176709b833b1792140ec
-l
-<src/main/java/pl/training/supernova/examples/JmhExample.java,4\7\47b5c8f0a0b1f0647e5af394c8bf9af7617f4df0
 b
 2src/main/java/pl/training/supernova/PersonRow.java,a\3\a3907d727d1a6c1b97eefc42f4a368be89def05f
 o

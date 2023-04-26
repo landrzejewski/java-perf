@@ -5,6 +5,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.WarmupMode;
 
 @State(Scope.Benchmark)
 //@BenchmarkMode({Mode.SampleTime, Mode.Throughput, Mode.AverageTime})
@@ -42,11 +43,60 @@ public class JmhExample {
         blackhole.consume(factorial.factorialWithLoop(n));
     }
 
+    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
     @Fork(1)
     @Benchmark
     public void testFactorialWithLoopWithoutBlackHole(/*TestInfo testInfo*/) {
         factorial.factorialWithLoop(n);
     }
+
+
+    @State(Scope.Thread)
+    @AuxCounters(AuxCounters.Type.OPERATIONS)
+    public static class Counters {
+
+        public int firstResult;
+        public int secondResult;
+
+        public int totalResult() {
+            return firstResult + secondResult;
+        }
+
+    }
+
+    @Benchmark
+    public void testAuxCalculateValue(Counters counters) {
+        if (Math.random() < 0.2) {
+            counters.firstResult++;
+        } else {
+            counters.secondResult++;
+        }
+    }
+
+    @Param({"1", "2", "3"})
+    public int size;
+
+    @Benchmark
+    public byte[] testParameterValues() {
+        return new byte[size];
+    }
+
+
+    @Group("one")
+    @GroupThreads(4)
+    @Benchmark
+    public double taskOne() {
+        return Math.random();
+    }
+
+    @Group("one")
+    @GroupThreads(2)
+    @Benchmark
+    public double taskTwo() {
+        return Math.random();
+    }
+
+
 
    /* @Benchmark
     public long testFactorialWithStream(*//*TestInfo testInfo*//*) {
@@ -57,7 +107,8 @@ public class JmhExample {
     // -rff results.csv - save results to file
     public static void main(String[] args) throws RunnerException {
         var options = new OptionsBuilder()
-                //.include(Factorial.class.getSimpleName())
+                .include("testAuxCalculateValue")
+                .warmupMode(WarmupMode.BULK)
                 .warmupIterations(1)
                 .measurementIterations(1)
                 .threads(1)

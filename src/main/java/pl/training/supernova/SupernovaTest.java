@@ -1,6 +1,7 @@
 package pl.training.supernova;
 
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
@@ -12,16 +13,32 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.Throughput)
+@BenchmarkMode(Mode.SingleShotTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 public class SupernovaTest {
 
     private final Path filePath = Paths.get("persons.data");
     private final Random random = new Random();
     private long id;
+    private long readId;
     private Supernova<PersonRow, Long> supernova;
     private PersonRow nextPerson;
+
+    @State(Scope.Thread)
+    @AuxCounters(AuxCounters.Type.EVENTS)
+    public static class OperationCounters {
+
+        public long read;
+        public long insert;
+
+        public long total() {
+            return read + insert;
+        }
+
+    }
 
     @Setup(Level.Trial)
     public void beforeAll() throws IOException {
@@ -36,8 +53,9 @@ public class SupernovaTest {
 
     @Setup(Level.Invocation)
     public void create() {
+        readId = random.nextLong(id + 1);
         nextPerson = PersonRow.builder()
-                .id(++id)
+                .id(id)
                 .firstName(UUID.randomUUID().toString())
                 .lastName(UUID.randomUUID().toString())
                 .age(random.nextInt(40) + 5)
@@ -45,16 +63,26 @@ public class SupernovaTest {
                 .build();
     }
 
+    @Group("a")
     @Benchmark
-    public void supernovaInsert() {
+    public void supernovaInsert(OperationCounters counters, Blackhole blackhole) {
+        ++id;
         supernova.insert(nextPerson);
+        counters.insert++;
+    }
+
+    @Group("a")
+    @Benchmark
+    public void supernovaRead(OperationCounters counters, Blackhole blackhole) {
+        blackhole.consume(supernova.getById(readId));
+        counters.read++;
     }
 
     public static void main(String[] args) throws RunnerException {
       var options = new OptionsBuilder()
                 .include("SupernovaTest")
-                .warmupIterations(1)
-                .measurementIterations(1)
+                .warmupIterations(0)
+                .measurementIterations(100_000)
                 .threads(1)
                 .forks(1)
                 .build();
@@ -62,3 +90,14 @@ public class SupernovaTest {
     }
 
 }
+
+/*
+
+Benchmark                                 Mode  Cnt  Score   Error  Units
+SupernovaTest.supernovaInsertRead         avgt       0,005          ms/op
+SupernovaTest.supernovaInsertRead:insert  avgt       0,016          ms/op
+SupernovaTest.supernovaInsertRead:read    avgt       0,007          ms/op
+
+
+
+ */
