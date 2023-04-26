@@ -64,6 +64,7 @@ public class SupernovaTest {
     }
 
     @Group("a")
+    @GroupThreads(1)
     @Benchmark
     public void supernovaInsert(OperationCounters counters, Blackhole blackhole) {
         ++id;
@@ -72,6 +73,7 @@ public class SupernovaTest {
     }
 
     @Group("a")
+    @GroupThreads(1)
     @Benchmark
     public void supernovaRead(OperationCounters counters, Blackhole blackhole) {
         blackhole.consume(supernova.getById(readId));
@@ -82,8 +84,8 @@ public class SupernovaTest {
       var options = new OptionsBuilder()
                 .include("SupernovaTest")
                 .warmupIterations(0)
-                .measurementIterations(10_000)
-                .threads(1)
+                .measurementIterations(1_000_000)
+                .threads(2)
                 .forks(1)
                 .build();
         new Runner(options).run();
