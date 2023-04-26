@@ -14,18 +14,17 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Group)
 public class SupernovaTest {
 
-    private final Path filePath = Paths.get("persons5.data");
+    private final Path filePath = Paths.get("persons_new.data");
+
     private final Random random = new Random();
-    private long id;
-    private long readId;
     private Supernova<PersonRow, Long> supernova;
-    private PersonRow nextPerson;
 
     @State(Scope.Thread)
     @AuxCounters(AuxCounters.Type.EVENTS)
@@ -43,7 +42,7 @@ public class SupernovaTest {
     @Setup(Level.Trial)
     public void beforeAll() throws IOException {
         Files.deleteIfExists(filePath);
-        supernova = new SynchronizedSupernova(new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>()));
+        supernova = new FlatFileSupernova<>(filePath, new PersonRow(), new HashMap<>());
     }
 
     @TearDown
@@ -51,10 +50,15 @@ public class SupernovaTest {
         supernova.close();
     }
 
-    @Setup(Level.Trial)
-    public void create() {
-        readId = random.nextLong(id + 1);
-        nextPerson = PersonRow.builder()
+    @State(Scope.Group)
+    public static class TestState {
+
+        private final AtomicLong numberOfRecords = new AtomicLong(1);
+
+    }
+
+    private PersonRow createRow(Long id) {
+        return PersonRow.builder()
                 .id(id)
                 .firstName(UUID.randomUUID().toString())
                 .lastName(UUID.randomUUID().toString())
@@ -64,19 +68,22 @@ public class SupernovaTest {
     }
 
     @Group("a")
-    @GroupThreads(4)
+    @GroupThreads(1)
     @Benchmark
-    public void supernovaInsert(OperationCounters counters, Blackhole blackhole) {
-        ++id;
-        supernova.insert(nextPerson);
+    public void supernovaInsert(OperationCounters counters, TestState testState) {
+        var id = testState.numberOfRecords.incrementAndGet();
+        var person = createRow(id);
+        supernova.insert(person);
         counters.insert++;
+
     }
 
     @Group("a")
-    @GroupThreads(4)
+    @GroupThreads(7)
     @Benchmark
-    public void supernovaRead(OperationCounters counters, Blackhole blackhole) {
-        blackhole.consume(supernova.getById(readId));
+    public void supernovaRead(OperationCounters counters, Blackhole blackhole, TestState testState) {
+        var id = random.nextLong(testState.numberOfRecords.get());
+        blackhole.consume(supernova.getById(id));
         counters.read++;
     }
 
@@ -84,7 +91,7 @@ public class SupernovaTest {
       var options = new OptionsBuilder()
                 .include("SupernovaTest")
                 .warmupIterations(0)
-                .measurementIterations(200_000)
+                .measurementIterations(500_000)
                 .threads(8)
                 .forks(1)
                 .build();
