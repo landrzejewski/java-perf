@@ -34,7 +34,7 @@ public class SupernovaTest {
         supernova.close();
     }
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Invocation)
     public void create() {
         nextPerson = PersonRow.builder()
                 .id(++id)
