@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PersonRecord implements Record {
+public class PersonRow implements Row<Long> {
 
     private static final int FIRST_NAME_SIZE = 50;
     private static final int LAST_NAME_SIZE = 70;
@@ -22,6 +22,11 @@ public class PersonRecord implements Record {
     private String lastName;
     private int age;
     private boolean isActive;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
 
     @Override
     public byte[] toBytes() {
@@ -35,13 +40,15 @@ public class PersonRecord implements Record {
     }
 
     @Override
-    public void fromBytes(byte[] bytes) {
+    public Row fromBytes(byte[] bytes) {
         var buffer = ByteBuffer.wrap(bytes);
-        id = buffer.getLong();
-        firstName = getString(readNextBytes(buffer, FIRST_NAME_SIZE));
-        lastName = getString(readNextBytes(buffer, LAST_NAME_SIZE));
-        age = buffer.getInt();
-        isActive = getBoolean(readNextBytes(buffer, BOOL_SIZE));
+        return PersonRow.builder()
+                .id(buffer.getLong())
+                .firstName(getString(readNextBytes(buffer, FIRST_NAME_SIZE)))
+                .lastName(getString(readNextBytes(buffer, LAST_NAME_SIZE)))
+                .age(buffer.getInt())
+                .isActive(getBoolean(readNextBytes(buffer, BOOL_SIZE)))
+                .build();
     }
 
     private byte[] readNextBytes(ByteBuffer buffer, int size) {
@@ -51,7 +58,7 @@ public class PersonRecord implements Record {
     }
 
     @Override
-    public long getSize() {
+    public int getSize() {
         return RECORD_SIZE;
     }
 

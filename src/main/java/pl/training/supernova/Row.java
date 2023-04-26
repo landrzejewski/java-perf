@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public interface Record {
+public interface Row<I> {
 
     Charset CHARSET = UTF_8;
     int START_POSITION = 0;
@@ -16,9 +16,11 @@ public interface Record {
     int INT_SIZE = 4;
     int BOOL_SIZE = 1;
 
+    I getId();
+
     byte[] toBytes();
 
-    void fromBytes(byte[] bytes);
+    Row fromBytes(byte[] bytes);
 
     default byte[] toField(byte[] data, int size) {
         var bytes = new byte[size];
@@ -46,6 +48,6 @@ public interface Record {
         return bytes[0] == TRUE_VALUE;
     }
 
-    long getSize();
+    int getSize();
 
 }
