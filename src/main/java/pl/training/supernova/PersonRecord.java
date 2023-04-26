@@ -34,13 +34,13 @@ public class PersonRecord implements Record {
     public void fromBytes(byte[] bytes) {
         var buffer = ByteBuffer.wrap(bytes);
         id = buffer.getLong();
-        firstName = getString(readBytes(buffer, FIRST_NAME_SIZE));
-        lastName = getString(readBytes(buffer, LAST_NAME_SIZE));
+        firstName = getString(readNextBytes(buffer, FIRST_NAME_SIZE));
+        lastName = getString(readNextBytes(buffer, LAST_NAME_SIZE));
         age = buffer.getInt();
-        isActive = getBoolean(readBytes(buffer, BOOL_SIZE));
+        isActive = getBoolean(readNextBytes(buffer, BOOL_SIZE));
     }
 
-    private byte[] readBytes(ByteBuffer buffer, int size) {
+    private byte[] readNextBytes(ByteBuffer buffer, int size) {
         var bytes = new byte[size];
         buffer.get(bytes);
         return bytes;
