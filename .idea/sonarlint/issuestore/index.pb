@@ -7,8 +7,6 @@ s
 Csrc/main/java/pl/training/supernova/examples/SerializationTest.java,d\a\dab3ab473acfc5a780d78a01fae8d0e8605bf68f
 k
 ;src/main/java/pl/training/supernova/examples/TicTacToe.java,5\5\55bf249eaf7ed6906ced628f2fec91be6b4ce057
-;
-results.csv,1\c\1c22fd0d7b5db97c99cbde94ec3989d70633a214
 h
 8src/main/java/pl/training/supernova/examples/Person.java,e\e\eed31b65f6c0ff591575d1a88a562d9a8e6fe3d8
 l
